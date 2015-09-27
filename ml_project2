@@ -1,0 +1,37 @@
+library(caret)
+library(randomForest)
+library(plyr)
+
+training <- read.csv("pml-training.csv")
+
+#Clean up the data by removing the first 7 "housekeeping" columns, and any columns that are all blank or all NAs.
+#Removing these columns leaves 52 features, plus the classe variable.
+good_columns = c()
+
+for (i in 1:dim(training)[2]) {
+if (sum(is.na(training[,i])) == 0 && is.na(count(training[,i]=='')[2,2])) {
+	good_columns <- append(good_columns,i)
+	}
+}
+subtraining <- training[,good_columns]
+subtraining <- subtraining[,8:60]
+print(dim(subtraining))
+
+#Split the cleaned up data into two portions: 70% for training, and 30% for estimating out-of-sample error
+inTrain <- createDataPartition(y=subtraining$classe, p=0.7, list=FALSE)
+training <- subtraining[inTrain,]
+testing <- subtraining[-inTrain,]
+
+#Build a model using the training set, then examine its accuracy on the cross-validation set to determine 
+#out-of-sample error. I chose a random forest model for its high accuracy.
+modfit <- randomForest(training$classe~., data=training,mtry=7,importance=TRUE)
+pred <- predict(modfit,testing)
+print(table(pred,testing$classe))
+
+#Yields 99.6% accuracy in crossvalidation data! So let's try it out on the test data.
+final <- read.csv("pml-testing.csv")
+subfinal <- final[,good_columns]
+subfinal <- subfinal[,8:60]
+
+final_output <- predict(modfit,subfinal)
+print(final_output)
