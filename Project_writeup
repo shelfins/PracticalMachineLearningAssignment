@@ -1,0 +1,8 @@
+For this project, I chose to use a random forest classifier as they are good for high accuracy. 
+First, I cleaned the data to remove the first 7 columns with "housekeeping" variables, and then removed all
+columns with all NAs or blanks. This left 52 columns of predictor features, plus the classe variable.
+To estimate out-of-sample error, I split the data into 70% training set, 30% cross-validation set. After
+training on the training set, I predicted classes for the cross-validation set and compared those to the
+actual class, and discovered that we were able to predict with 99.6% accuracy in that cross-validation set,
+leading me to believe out-of-sample accuracy would be 99.6%. I then used this model from the training set on
+the test set, and got all 20 answers correct.
